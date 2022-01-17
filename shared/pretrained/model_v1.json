@@ -1,0 +1,8 @@
+{
+    "model": "Aug21",
+    "subtract_gravity": false,
+    "target_imu_rate": 100,
+    "window_size": 360,
+    "window_size_after": 0,
+    "window_size_before": 0
+}
