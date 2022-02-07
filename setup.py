@@ -10,7 +10,7 @@ setuptools.setup(
     python_requires=">=3.7",
     ext_modules=[],
     install_requires=[
-        'numpy >=1.16.4, <=1.21',
+        'numpy >=1.16.4, <1.22',
         'tqdm',
         'h5py',
         'matplotlib',

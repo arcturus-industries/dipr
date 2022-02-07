@@ -10,7 +10,7 @@ source <venv_path>/bin/activate
 
 git clone https://github.com/arcturus-industries/dipr.git && cd dipr
 pip3 install -e .
-python3 dipr/evaluate.py --challenge_folder <data_path>
+python3 dipr/evaluate.py --data_folder ./shared
 ```
 
 ## Getting Started (with Docker)
@@ -18,9 +18,9 @@ You will need `docker` and `realpath` commands to be installed
 ```
 git clone https://github.com/arcturus-industries/dipr.git && cd dipr
 # on x86_64 systems
-./build-and-run.sh <data_path>
+./build-and-run.sh ./shared
 # on arm64 systems (like mac M1)
-./build-and-run-aarch64.sh <data_path>
+./build-and-run-aarch64.sh ./shared
 ```
 M1 Mac note: You can use either the X86_64 container or the arm64 container.  If you use the x86_64 container, you may see "Could not initialize NNPACK! Reason: Unsupported hardware." This is only a warning. It will however take a long time to run (about 30 minutes or longer after the docker build finishes)
 
@@ -38,15 +38,15 @@ M1 Mac note: You can use either the X86_64 container or the arm64 container.  If
 
 
 ```bash
-python3 evaluate.py --challenge_folder <data_path>
+python3 evaluate.py --data_folder ./shared
 ```
 
 or for the docker versions
 ```bash
 # on x86_64 systems
-./build-and-run.sh <data_path>
+./build-and-run.sh ./shared
 # on arm64 systems (like mac M1)
-./build-and-run-aarch64.sh <data_path>
+./build-and-run-aarch64.sh ./shared
 ```
 
 It will output something like:
@@ -61,7 +61,7 @@ all_pose_mae_fallback 15.51cm
 
 Which mean it found `OpenVR_2021-09-02_17-40-34-synthetic` test dataset, and executed ImuFallback on 13 segments of duration 7 seconds, and estimated over them averaged Mean Absolute Velocity Error as 9.73cm/s
 
-It also outputs image with tracking plots to `<challenge_folder_root>/_results/<datasetname>.png`. There are plots for IMU only tracking, ImuFallback + CNN traking and ground truth
+It also outputs image with tracking plots to `<data_folder_root>/_results/<datasetname>.png`. There are plots for IMU only tracking, ImuFallback + CNN traking and ground truth
 
 ## Challenge folder Content
 

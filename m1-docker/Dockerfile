@@ -7,7 +7,7 @@ RUN apt update \
         # && rm -rf /root/.cache/* \
         # && rm -rf /root/.config/pip
 
-RUN python3 -m pip install numpy torch -f https://torch.kmtea.eu/whl/stable.html -f https://ext.kmtea.eu/whl/stable.html \
+RUN python3 -m pip install numpy torch==1.10 -f https://torch.kmtea.eu/whl/stable.html -f https://ext.kmtea.eu/whl/stable.html \
         && rm -rf /root/.cache/* \
         && rm -rf /root/.config/pip
 COPY . /dipr

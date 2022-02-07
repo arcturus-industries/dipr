@@ -35,6 +35,7 @@ class Evaluator(object):
 
         test_data_folder = os.path.join(config.data_folder, 'test_synthetic')
         self.hdf5_files = glob.glob(os.path.join(test_data_folder, '*.hdf5'))
+        assert len(self.hdf5_files) > 0, 'test data folder is empty, please check paths in command line parameters'
 
         self.backend = TorchScriptBackend(config.model_path)
         self.window_time = self.backend.window_size * self.backend.target_imu_rate
@@ -203,13 +204,13 @@ class Evaluator(object):
 
         # compute accumulated averaged metrics
         all_vel_mae_cnn = np.mean([m for v in metrics.values() for m in v['vel_mae_cnn']])
-        all_vel_mae_fallback = np.mean([m for v in metrics.values() for m in v['vel_mae_fallback']])
-        all_pose_mae_fallback = np.mean([m for v in metrics.values() for m in v['pose_mae_fallback']])
-        metrics.update(all_vel_mae_cnn=all_vel_mae_cnn, all_vel_mae_fallback=all_vel_mae_fallback, all_pose_mae_fallback=all_pose_mae_fallback)
+        all_vel_mae_final_ekf = np.mean([m for v in metrics.values() for m in v['vel_mae_fallback']])
+        all_pose_mae_final_ekf = np.mean([m for v in metrics.values() for m in v['pose_mae_fallback']])
+        metrics.update(all_vel_mae_cnn=all_vel_mae_cnn, all_vel_mae_fallback=all_vel_mae_final_ekf, all_pose_mae_fallback=all_pose_mae_final_ekf)
 
         print(f'all_vel_mae_cnn {all_vel_mae_cnn * 100:0.02f}cm/s')
-        print(f'all_vel_mae_fallback {all_vel_mae_fallback * 100:0.02f}cm/s')
-        print(f'all_pose_mae_fallback {all_pose_mae_fallback * 100:0.02f}cm')
+        print(f'all_vel_mae_final_ekf {all_vel_mae_final_ekf * 100:0.02f}cm/s')
+        print(f'all_pose_mae_final_ekf {all_pose_mae_final_ekf * 100:0.02f}cm')
 
         import json
         with open(Path(config.data_folder) / '_results/metrics.json', 'w') as f:

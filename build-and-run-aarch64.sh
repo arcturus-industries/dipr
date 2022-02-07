@@ -17,4 +17,4 @@ docker build -t arctururs-dipr-m1:dev -f m1-docker/Dockerfile .
 
 DATA_DIR=`realpath "$1"`
 echo "Mounting $DATA_DIR to /data in the container"
-docker run --mount type=bind,source="$DATA_DIR",target=/data arctururs-dipr-m1:dev python3 /dipr/dipr/evaluate.py --challenge_folder /data
+docker run --mount type=bind,source="$DATA_DIR",target=/data arctururs-dipr-m1:dev python3 /dipr/dipr/evaluate.py --data_folder /data
