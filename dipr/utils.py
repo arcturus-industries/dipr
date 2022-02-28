@@ -1,8 +1,9 @@
+import pickle
 import bisect
-from typing import Sequence, Any, Optional, Callable
-
 import numpy as np
 import quaternion as q
+
+from typing import Sequence, Any, Optional, Callable
 
 
 def bisect_left(a: Sequence[Any], x: Any, key: Optional[Callable[[Any], Any]] = None, lo: int = 0, hi: Optional[int] = None) -> int:
@@ -256,3 +257,21 @@ def set_random_seed(seed: int) -> None:
         tf.compat.v1.set_random_seed(seeds[2])  # must be before graph and session
     except ImportError:
         pass
+
+
+def pickle_save(path: str, obj: Any) -> str:
+    with open(path, 'wb') as f:
+        pickle.dump(obj, f)
+    return path
+
+
+def pickle_load(path: str) -> Any:
+    with open(path, 'rb') as f:
+        return pickle.load(f)
+
+
+def pickle_try_load(path: str, default: Optional[Any] = None) -> Any:
+    try:
+        return pickle_load(path)
+    except (IOError, EOFError, ValueError, ModuleNotFoundError, pickle.UnpicklingError):
+        return default
