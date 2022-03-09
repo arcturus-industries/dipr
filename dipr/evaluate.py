@@ -194,13 +194,14 @@ class Evaluator(object):
             imu_only, fallback, gt, cnn_preds = tuple(map(_concat_states_with_nans, zip(*results)))
             cnn_preds: CnnPreds
 
-            images = []
-            images.extend(self.plot_cnn_preds(data.name, cnn_preds=cnn_preds))
-            images.extend(self.plot_states(data.name, plot_eulers=False, imu_only=imu_only, fallback=fallback, gt=gt))
+            if not config.dont_save_plots:
+                images = []
+                images.extend(self.plot_cnn_preds(data.name, cnn_preds=cnn_preds))
+                images.extend(self.plot_states(data.name, plot_eulers=False, imu_only=imu_only, fallback=fallback, gt=gt))
 
-            plot_file = self.save_plots(config.data_folder, data.name, images)
-            metrics[data.name].update(**dict(plots_file=plot_file))
-            u.open_plots(filename=plot_file)
+                plot_file = self.save_plots(config.data_folder, data.name, images)
+                metrics[data.name].update(**dict(plots_file=plot_file))
+                u.open_plots(filename=plot_file)
 
         # compute accumulated averaged metrics
         all_vel_mae_cnn = np.mean([m for v in metrics.values() for m in v['vel_mae_cnn']])
@@ -224,6 +225,7 @@ if __name__ == '__main__':
     parser.add_argument('--update_rate', type=int, default=20, help='EKF update rate or CNN call step')
     parser.add_argument('--model_path', type=str, default=None, help='Path to CNN model to use')
 
+    parser.add_argument('--dont_save_plots', '-dsp', action='store_true', help='Show IMU only plot')
     parser.add_argument('--plot_imu_only', '-pio', action='store_true', help='Show IMU only plot')
     parser.add_argument('--verbose', '-v', action='store_true', help='Enable more logging')
     parser.add_argument('--seed', '-s', type=int, default=777, help='Random seed for noise generation')
