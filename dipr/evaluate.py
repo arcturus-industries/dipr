@@ -30,15 +30,17 @@ def _concat_states_with_nans(states: Tuple[Union[StatesArray, CnnPreds]]) -> Opt
 
 class Evaluator(object):
 
+    minimal_required_imu_history_seconds = 5  # fixing this to filter out segments at very beginning for test dataset
+
     def __init__(self, config: argparse.Namespace):
         self.config = config
 
         test_data_folder = os.path.join(config.data_folder, 'test_synthetic')
-        self.hdf5_files = glob.glob(os.path.join(test_data_folder, '*.hdf5'))
+        self.hdf5_files = sorted(glob.glob(os.path.join(test_data_folder, '*.hdf5')))
         assert len(self.hdf5_files) > 0, 'test data folder is empty, please check paths in command line parameters'
 
         self.backend = TorchScriptBackend(config.model_path)
-        self.window_time = self.backend.window_size * self.backend.target_imu_rate
+        self.window_time = self.backend.window_size / self.backend.target_imu_rate
 
         from noise_utils import NoiseModel
         self.noise_model = NoiseModel()
@@ -123,7 +125,8 @@ class Evaluator(object):
         # get imu samples we need for tracking, need window_time in past to have enought data for CNN
         i0 = u.bisect_right(data.imu.times, beg - data_window_time) - 1
         i1 = u.bisect_left(data.imu.times, end)
-        data_imu: ImuArray = data.imu[max(i0, 0):i1]
+        assert i0 >= 0, 'not enough IMU history to run current segment with requested window size'
+        data_imu: ImuArray = data.imu[i0:i1]
 
         self.noise_model.add_imu_noise(data_imu.data[:, 1:])
 
@@ -183,6 +186,9 @@ class Evaluator(object):
 
             results: List[Tuple[StatesArray, StatesArray, StatesArray, CnnPreds]] = []
             for beg, end in data.segments:
+                # skip segments that doesn't have enough IMU history
+                if beg - self.minimal_required_imu_history_seconds < data.imu.times[0]:
+                    continue
                 data_window_time = self.window_time + 0.007  # add safety margin to time
                 results.append(self.run_segment(data, beg, end, data_window_time, enable_imu_only=self.config.plot_imu_only))
 
